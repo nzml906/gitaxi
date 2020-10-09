@@ -1,0 +1,95 @@
+<template>
+  <div class="VueApp grid__row">
+    <!-- modal -->
+    <div
+      class="sidebar-cover"
+      v-show="isShowSidebar"
+      @click="hideSidebar"
+    ></div>
+    <!-- sidenav -->
+    <sidebar v-bind:class="{ 'sidebar--open': isShowSidebar }"></sidebar>
+    <!-- navbar -->
+    <header-section @toggleSidebar="toggleSidebar"></header-section>
+    <!-- Loading -->
+    <div class="loading" v-show="isLoading">
+      <img src="assets/loading.gif" alt="Loading" />
+    </div>
+    <!-- body -->
+    <div class="main">
+      <transition name="fade" mode="out-in">
+        <keep-alive>
+          <router-view></router-view>
+        </keep-alive>
+      </transition>
+    </div>
+    <!-- bottomNav -->
+    <user-profile-action></user-profile-action>
+
+    <!-- <simplert></simplert> -->
+  </div>
+</template>
+
+<script>
+const Sidebar = () => import('@/components/Sidebar.vue');
+import HeaderSection from '@/components/HeaderSection.vue';
+import UserProfileAction from '@/components/UserProfileAction.vue';
+export default {
+  name: 'app',
+  components: { Sidebar, HeaderSection, UserProfileAction },
+  computed: {
+    isShowSidebar() {
+      return this.$store.getters.isShowSidebar;
+    },
+    isLoading() {
+      return this.$store.getters.isLoading;
+    },
+    userData() {
+      return this.$store.getters.userData;
+    }
+  },
+  methods: {
+    hideSidebar: function() {
+      this.$store.commit('setShowSidebar', false);
+    },
+    toggleSidebar: function() {
+      this.$store.commit('setShowSidebar', !this.isShowSidebar);
+    }
+  },
+  created() {
+    this.$store.dispatch('readBookmarkUser');
+  }
+};
+</script>
+
+<style lang="scss">
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+    'Segoe UI Symbol';
+}
+
+@import '~vue-ionicons/ionicons.scss';
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s;
+}
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+}
+.sidebar-cover {
+  background-color: rgba(0, 0, 0, 0.5);
+  position: fixed;
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+  left: 0px;
+  height: 100%;
+  z-index: 19;
+}
+.loading {
+  text-align: center;
+  padding-top: 50px;
+}
+</style>
